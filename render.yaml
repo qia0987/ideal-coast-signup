@@ -1,0 +1,10 @@
+﻿services:
+  - type: web
+    name: ideal-coast-signup
+    runtime: node
+    plan: free
+    buildCommand: "echo 'no build needed'"
+    startCommand: "node server.js"
+    envVars:
+      - key: NODE_ENV
+        value: production
