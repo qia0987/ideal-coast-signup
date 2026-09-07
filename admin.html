@@ -1,0 +1,287 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>理想海岸 · 报名管理后台</title>
+<style>
+:root{--ocean-deep:#0A4D68;--ocean:#088395;--sky:#05BFDB;--coral:#FF6B35;--gold:#F2C94C;--ink:#1A2A3A;--muted:#5A6A7A;--white:#fff;--bg:#F0F4F8;--border:#E0E6ED;--radius:12px}
+*{margin:0;padding:0;box-sizing:border-box}
+body{font-family:"PingFang SC","Microsoft YaHei",sans-serif;background:var(--bg);color:var(--ink);line-height:1.6}
+
+/* Login */
+.login-wrap{min-height:100vh;display:flex;align-items:center;justify-content:center;background:linear-gradient(135deg,var(--ocean-deep),var(--ocean))}
+.login-card{background:var(--white);border-radius:20px;padding:40px 32px;box-shadow:0 20px 60px rgba(0,0,0,.2);width:360px;max-width:90vw}
+.login-card h1{font-size:20px;font-weight:700;color:var(--ocean-deep);text-align:center;margin-bottom:8px}
+.login-card p{text-align:center;color:var(--muted);font-size:13px;margin-bottom:24px}
+.login-input{width:100%;padding:12px 14px;border:2px solid var(--border);border-radius:10px;font-size:15px;outline:none;transition:border-color .3s}
+.login-input:focus{border-color:var(--sky)}
+.login-btn{width:100%;padding:13px;border:none;border-radius:10px;background:linear-gradient(135deg,var(--coral),#FF8A5C);color:#fff;font-size:16px;font-weight:700;cursor:pointer;margin-top:16px;transition:transform .2s}
+.login-btn:active{transform:scale(.97)}
+.login-err{color:var(--coral);font-size:13px;text-align:center;margin-top:8px;display:none}
+
+/* Admin */
+.admin{display:none}
+.admin-header{background:var(--white);padding:16px 24px;box-shadow:0 2px 8px rgba(0,0,0,.06);display:flex;justify-content:space-between;align-items:center;position:sticky;top:0;z-index:10}
+.admin-header h1{font-size:18px;font-weight:700;color:var(--ocean-deep)}
+.admin-header .info{font-size:13px;color:var(--muted)}
+.logout-btn{padding:6px 14px;border:1px solid var(--border);border-radius:8px;background:var(--white);color:var(--muted);font-size:13px;cursor:pointer}
+
+.admin-body{padding:24px;max-width:1200px;margin:0 auto}
+
+.stats{display:flex;gap:16px;margin-bottom:24px}
+.stat-card{background:var(--white);border-radius:var(--radius);padding:20px 24px;box-shadow:0 2px 8px rgba(0,0,0,.04);flex:1}
+.stat-card .label{font-size:13px;color:var(--muted);margin-bottom:4px}
+.stat-card .num{font-size:28px;font-weight:800;color:var(--ocean-deep)}
+.stat-card .num.accent{color:var(--coral)}
+
+.toolbar{display:flex;gap:12px;margin-bottom:20px;flex-wrap:wrap}
+.tool-btn{padding:10px 18px;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;transition:all .2s}
+.tool-btn.export{background:rgba(5,191,219,.1);color:var(--ocean);border:1px solid rgba(5,191,219,.2)}
+.tool-btn.export:hover{background:rgba(5,191,219,.18)}
+.tool-btn.refresh{background:rgba(10,77,104,.08);color:var(--ocean-deep);border:1px solid rgba(10,77,104,.12)}
+.tool-btn.clear{background:rgba(255,107,53,.1);color:var(--coral);border:1px solid rgba(255,107,53,.2)}
+.tool-btn.clear:hover{background:rgba(255,107,53,.18)}
+
+.search-box{flex:1;min-width:200px;padding:10px 14px;border:2px solid var(--border);border-radius:8px;font-size:14px;outline:none}
+.search-box:focus{border-color:var(--sky)}
+
+.table-wrap{background:var(--white);border-radius:var(--radius);box-shadow:0 2px 12px rgba(0,0,0,.06);overflow:auto;max-height:65vh;overflow-y:auto}
+table{width:100%;border-collapse:collapse;min-width:800px}
+thead{position:sticky;top:0;background:var(--white);z-index:5}
+th{padding:12px 14px;text-align:left;font-size:13px;font-weight:600;color:var(--muted);border-bottom:2px solid var(--border);white-space:nowrap}
+td{padding:12px 14px;font-size:14px;color:var(--ink);border-bottom:1px solid #F0F2F5;vertical-align:top}
+tr:hover{background:#F8FAFC}
+.tag{display:inline-block;padding:2px 8px;border-radius:4px;font-size:12px;background:rgba(5,191,219,.12);color:var(--ocean)}
+.row-actions{display:flex;gap:6px}
+.row-btn{padding:4px 10px;border:none;border-radius:6px;font-size:12px;cursor:pointer}
+.row-btn.edit{background:rgba(5,191,219,.1);color:var(--ocean)}
+.row-btn.del{background:rgba(255,107,53,.1);color:var(--coral)}
+.row-btn.save{background:rgba(8,131,149,.15);color:var(--ocean-deep);font-weight:600}
+.edit-input{width:100%;padding:4px 8px;border:1px solid var(--sky);border-radius:4px;font-size:13px;font-family:inherit}
+.empty{text-align:center;padding:60px 20px;color:var(--muted);font-size:15px}
+.empty .icon{font-size:48px;display:block;margin-bottom:12px;opacity:.3}
+
+@media(max-width:640px){
+  .stats{flex-direction:column}
+  .admin-body{padding:16px}
+  .toolbar{flex-direction:column}
+}
+</style>
+</head>
+<body>
+
+<!-- Login -->
+<div class="login-wrap" id="loginWrap">
+  <div class="login-card">
+    <h1>理想海岸 · 报名管理</h1>
+    <p>请输入管理密码</p>
+    <input type="password" class="login-input" id="pwdInput" placeholder="管理密码" autofocus>
+    <button class="login-btn" onclick="login()">进入后台</button>
+    <div class="login-err" id="loginErr">密码错误，请重试</div>
+  </div>
+</div>
+
+<!-- Admin -->
+<div class="admin" id="adminPanel">
+  <div class="admin-header">
+    <h1>理想海岸 · 报名管理后台</h1>
+    <div style="display:flex;align-items:center;gap:12px">
+      <span class="info" id="updateTime"></span>
+      <button class="logout-btn" onclick="logout()">退出</button>
+    </div>
+  </div>
+  <div class="admin-body">
+    <div class="stats">
+      <div class="stat-card"><div class="label">总报名数</div><div class="num" id="totalCount">0</div></div>
+      <div class="stat-card"><div class="label">今日新增</div><div class="num accent" id="todayCount">0</div></div>
+    </div>
+    <div class="toolbar">
+      <input type="text" class="search-box" id="searchBox" placeholder="搜索名称、联系人、电话..." oninput="renderTable()">
+      <button class="tool-btn refresh" onclick="loadData()">刷新</button>
+      <button class="tool-btn export" onclick="exportCSV()">导出 CSV</button>
+    </div>
+    <div class="table-wrap">
+      <table>
+        <thead><tr>
+          <th>序号</th><th>合作方向</th><th>机构/个人</th><th>联系人</th><th>电话</th><th>意向项目</th><th>自有资源</th><th>备注</th><th>提交时间</th><th>操作</th>
+        </tr></thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<script>
+var API=window.location.origin+'/api';
+var token=sessionStorage.getItem('adminToken')||'';
+var records=[];
+
+// Auto-login if token exists
+if(token){showAdmin();}
+
+function login(){
+  var pwd=document.getElementById('pwdInput').value.trim();
+  if(!pwd)return;
+  var errEl=document.getElementById('loginErr');
+  fetch(API+'/auth',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({password:pwd})})
+    .then(function(r){
+      if(r.status===401){
+        errEl.textContent='密码错误，请重试';
+        errEl.style.display='block';
+        setTimeout(function(){errEl.style.display='none';},2000);
+        return null;
+      }
+      if(!r.ok)throw new Error('server error');
+      return r.json();
+    })
+    .then(function(d){if(d){token=d.token;sessionStorage.setItem('adminToken',token);showAdmin();}})
+    .catch(function(){
+      errEl.textContent='无法连接服务器，请确认服务已启动且用 IP 地址访问';
+      errEl.style.display='block';
+      setTimeout(function(){errEl.style.display='none';},3000);
+    });
+}
+
+document.getElementById('pwdInput').addEventListener('keydown',function(e){if(e.key==='Enter')login();});
+
+function showAdmin(){
+  document.getElementById('loginWrap').style.display='none';
+  document.getElementById('adminPanel').style.display='block';
+  loadData();
+}
+
+function logout(){sessionStorage.removeItem('adminToken');token='';location.reload();}
+
+function authHeader(){return{'Authorization':'Bearer '+token,'Content-Type':'application/json'};}
+
+function loadData(){
+  var btn=document.querySelector('.tool-btn.refresh');
+  if(btn){btn.textContent='刷新中...';btn.disabled=true;}
+  fetch(API+'/records',{headers:authHeader()})
+    .then(function(r){
+      if(r.status===401){logout();throw new Error();}
+      return r.json();
+    })
+    .then(function(d){
+      records=d;
+      document.getElementById('updateTime').textContent='更新于 '+new Date().toLocaleTimeString('zh-CN');
+      renderStats();renderTable();
+      if(btn){btn.textContent='刷新';btn.disabled=false;}
+    })
+    .catch(function(){
+      if(btn){btn.textContent='刷新';btn.disabled=false;}
+    });
+}
+
+function renderStats(){
+  document.getElementById('totalCount').textContent=records.length;
+  // 今日新增：兼容斜杠(2026/9/1)和横杠(2026-09-01)两种格式
+  var now=new Date();
+  var y=now.getFullYear(),m=now.getMonth()+1,d=now.getDate();
+  var fmt1=y+'/'+m+'/'+d;      // 2026/9/1
+  var fmt2=y+'-'+m+'-'+d;      // 2026-9-1
+  var fmt3=y+'-'+String(m).padStart(2,'0')+'-'+String(d).padStart(2,'0'); // 2026-09-01
+  var tc=records.filter(function(r){
+    var t=r.time||'';
+    return t.indexOf(fmt1)>-1||t.indexOf(fmt2)>-1||t.indexOf(fmt3)>-1;
+  }).length;
+  document.getElementById('todayCount').textContent=tc;
+}
+
+function esc(s){if(s===null||s===undefined||s==='')return'&nbsp;';var d=document.createElement('div');d.textContent=s;return d.innerHTML;}
+
+var editingId=null;
+
+function renderTable(){
+  var kw=(document.getElementById('searchBox').value||'').toLowerCase().trim();
+  var filtered=records.filter(function(r){
+    if(!kw)return true;
+    return(r.direction||'').toLowerCase().indexOf(kw)>-1||(r.org_name||'').toLowerCase().indexOf(kw)>-1||(r.contact_person||'').toLowerCase().indexOf(kw)>-1||(r.contact_phone||'').indexOf(kw)>-1||(r.project||'').toLowerCase().indexOf(kw)>-1;
+  });
+  var tb=document.getElementById('tbody');
+  if(filtered.length===0){
+    tb.innerHTML='<tr><td colspan="10" class="empty"><span class="icon">📭</span>'+(records.length===0?'暂无报名记录':'未找到匹配记录')+'</td></tr>';
+    return;
+  }
+  tb.innerHTML=filtered.map(function(r,i){
+    if(editingId===r.id)return renderEditRow(r,i);
+    return '<tr>'+
+      '<td>'+(i+1)+'</td>'+
+      '<td>'+(r.direction?('<span class="tag" style="background:rgba(255,107,53,.12);color:#FF6B35">'+esc(r.direction)+'</span>'):'')+'</td>'+
+      '<td>'+esc(r.org_name)+'</td>'+
+      '<td>'+esc(r.contact_person)+'</td>'+
+      '<td>'+esc(r.contact_phone)+'</td>'+
+      '<td>'+(r.project||'').split('、').map(function(p){return'<span class="tag">'+esc(p)+'</span>';}).join(' ')+'</td>'+
+      '<td style="max-width:200px">'+esc(r.resources)+'</td>'+
+      '<td style="max-width:150px">'+esc(r.remarks)+'</td>'+
+      '<td style="white-space:nowrap">'+esc(r.time)+'</td>'+
+      '<td><div class="row-actions"><button class="row-btn edit" onclick="editRow('+r.id+')">编辑</button><button class="row-btn del" onclick="delRow('+r.id+')">删除</button></div></td>'+
+    '</tr>';
+  }).join('');
+}
+
+function renderEditRow(r,i){
+  return '<tr style="background:#F0F8FF">'+
+    '<td>'+(i+1)+'</td>'+
+    '<td><input class="edit-input" id="e_dir_'+r.id+'" value="'+esc(r.direction||'')+'"></td>'+
+    '<td><input class="edit-input" id="e_org_'+r.id+'" value="'+esc(r.org_name)+'"></td>'+
+    '<td><input class="edit-input" id="e_person_'+r.id+'" value="'+esc(r.contact_person)+'"></td>'+
+    '<td><input class="edit-input" id="e_phone_'+r.id+'" value="'+esc(r.contact_phone)+'"></td>'+
+    '<td><input class="edit-input" id="e_proj_'+r.id+'" value="'+esc(r.project)+'"></td>'+
+    '<td><input class="edit-input" id="e_res_'+r.id+'" value="'+esc(r.resources)+'"></td>'+
+    '<td><input class="edit-input" id="e_rem_'+r.id+'" value="'+esc(r.remarks)+'"></td>'+
+    '<td>'+esc(r.time)+'</td>'+
+    '<td><div class="row-actions"><button class="row-btn save" onclick="saveRow('+r.id+')">保存</button><button class="row-btn edit" onclick="editingId=null;renderTable();">取消</button></div></td>'+
+  '</tr>';
+}
+
+function editRow(id){editingId=id;renderTable();}
+
+function saveRow(id){
+  var updated={
+    direction:document.getElementById('e_dir_'+id).value.trim(),
+    org_name:document.getElementById('e_org_'+id).value.trim(),
+    contact_person:document.getElementById('e_person_'+id).value.trim(),
+    contact_phone:document.getElementById('e_phone_'+id).value.trim(),
+    project:document.getElementById('e_proj_'+id).value.trim(),
+    resources:document.getElementById('e_res_'+id).value.trim(),
+    remarks:document.getElementById('e_rem_'+id).value.trim()
+  };
+  fetch(API+'/records/'+id,{method:'PUT',headers:authHeader(),body:JSON.stringify(updated)})
+    .then(function(r){return r.json();})
+    .then(function(){editingId=null;loadData();})
+    .catch(function(){alert('保存失败');});
+}
+
+function delRow(id){
+  if(!confirm('确认删除这条报名记录？'))return;
+  fetch(API+'/records/'+id,{method:'DELETE',headers:authHeader()})
+    .then(function(){loadData();})
+    .catch(function(){alert('删除失败');});
+}
+
+function clearAll(){
+  if(!confirm('确认清空全部报名记录？此操作不可恢复！'))return;
+  if(!confirm('再次确认：将删除所有报名数据，确定吗？'))return;
+  fetch(API+'/records',{method:'DELETE',headers:authHeader()})
+    .then(function(){loadData();})
+    .catch(function(){alert('清空失败');});
+}
+
+function exportCSV(){
+  fetch(API+'/export',{headers:{'Authorization':'Bearer '+token}})
+    .then(function(r){return r.text();})
+    .then(function(csv){
+      var blob=new Blob([csv],{type:'text/csv;charset=utf-8'});
+      var link=document.createElement('a');
+      link.href=URL.createObjectURL(blob);
+      link.download='报名记录_'+new Date().toLocaleDateString('zh-CN').replace(/\//g,'')+'.csv';
+      link.click();
+      URL.revokeObjectURL(link.href);
+    })
+    .catch(function(){alert('导出失败');});
+}
+</script>
+</body>
+</html>
