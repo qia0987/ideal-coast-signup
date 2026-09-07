@@ -1,10 +1,1 @@
-{
-  "framework": null,
-  "buildCommand": "echo skip build",
-  "rewrites": [
-    { "source": "/", "destination": "/outdoor-partner-recruit.html" },
-    { "source": "/performance", "destination": "/performance-recruit.html" },
-    { "source": "/admin", "destination": "/admin.html" },
-    { "source": "/api/(.*)", "destination": "/api" }
-  ]
-}
+﻿{"rewrites":[{"source":"/","destination":"/outdoor-partner-recruit.html"},{"source":"/performance","destination":"/performance-recruit.html"},{"source":"/admin","destination":"/admin.html"},{"source":"/api/(.*)","destination":"/api"}]}
