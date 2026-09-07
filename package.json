@@ -1,0 +1,11 @@
+﻿{
+  "name": "ideal-coast-signup",
+  "version": "1.0.0",
+  "description": "理想海岸户外运动合作伙伴招募 - 报名管理系统",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "keywords": [],
+  "license": "MIT"
+}
