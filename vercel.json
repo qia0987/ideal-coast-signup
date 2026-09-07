@@ -1,4 +1,6 @@
 {
+  "framework": null,
+  "buildCommand": "echo skip build",
   "rewrites": [
     { "source": "/", "destination": "/outdoor-partner-recruit.html" },
     { "source": "/performance", "destination": "/performance-recruit.html" },
