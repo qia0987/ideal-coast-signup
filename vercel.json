@@ -1,1 +1,1 @@
-{"rewrites":[{"source":"/","destination":"/outdoor-partner-recruit.html"},{"source":"/performance","destination":"/performance-recruit.html"},{"source":"/admin","destination":"/admin.html"},{"source":"/api/:path*","destination":"/api"}]}
+{"outputDirectory":".","rewrites":[{"source":"/","destination":"/outdoor-partner-recruit.html"},{"source":"/performance","destination":"/performance-recruit.html"},{"source":"/admin","destination":"/admin.html"},{"source":"/api/:path*","destination":"/api"}]}
